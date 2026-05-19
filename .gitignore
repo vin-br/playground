@@ -93,3 +93,7 @@ $RECYCLE.BIN/
 *.swp
 *.pid
 *.seed
+
+# ---- Health Converter Specific ----
+./health_converter/data/csv/    # Withings health data export
+./health_converter/data/gpx/    # Generated GPX workout files
