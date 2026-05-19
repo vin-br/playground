@@ -93,3 +93,6 @@ $RECYCLE.BIN/
 *.swp
 *.pid
 *.seed
+
+# ---- Health Converter Specific ----
+health_converter/data/
