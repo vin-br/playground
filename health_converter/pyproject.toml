@@ -1,0 +1,11 @@
+[project]
+name = "withings2gpx"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gpxpy>=1.6.2",
+    "lxml>=6.1.0",
+    "pandas>=3.0.2",
+]
