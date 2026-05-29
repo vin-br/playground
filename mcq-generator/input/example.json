@@ -1,0 +1,209 @@
+{
+    "subject": "JavaScript",
+    "subject_key": "javascript",
+    "questions": [
+        {
+            "id": 1,
+            "type": "mcq",
+            "difficulty": "easy",
+            "question": "Which keyword declares a block-scoped variable in modern JavaScript?",
+            "choices": [
+                "A. var",
+                "B. let",
+                "C. def",
+                "D. dim"
+            ],
+            "correct": "B",
+            "explanation": "let declares a block-scoped variable introduced in ES6. var is function-scoped, while def and dim are not JavaScript keywords."
+        },
+        {
+            "id": 2,
+            "type": "mcq",
+            "difficulty": "easy",
+            "question": "Which method converts a JSON string into a JavaScript object?",
+            "choices": [
+                "A. JSON.parse()",
+                "B. JSON.stringify()",
+                "C. JSON.convert()",
+                "D. JSON.decode()"
+            ],
+            "correct": "A",
+            "explanation": "JSON.parse() parses a JSON string into an object. JSON.stringify() does the reverse. convert() and decode() do not exist on JSON."
+        },
+        {
+            "id": 3,
+            "type": "mcq",
+            "difficulty": "easy",
+            "question": "What does the === operator check in JavaScript?",
+            "choices": [
+                "A. Value only",
+                "B. Type only",
+                "C. Value and type",
+                "D. Reference only"
+            ],
+            "correct": "C",
+            "explanation": "=== is the strict equality operator: it checks both value and type without coercion. == checks value with type coercion."
+        },
+        {
+            "id": 4,
+            "type": "truefalse",
+            "difficulty": "easy",
+            "question": "In JavaScript, arrays are a type of object.",
+            "correct": "True",
+            "explanation": "Arrays in JavaScript are indeed objects. typeof [] returns 'object'. They inherit from Array.prototype which inherits from Object.prototype."
+        },
+        {
+            "id": 5,
+            "type": "truefalse",
+            "difficulty": "easy",
+            "question": "JavaScript is a statically typed language.",
+            "correct": "False",
+            "explanation": "JavaScript is dynamically typed. Variables do not have fixed types; a variable can hold a number, then a string, without any error."
+        },
+        {
+            "id": 6,
+            "type": "mcq",
+            "difficulty": "medium",
+            "question": "What is the output of: typeof NaN?",
+            "choices": [
+                "A. \"NaN\"",
+                "B. \"undefined\"",
+                "C. \"number\"",
+                "D. \"object\""
+            ],
+            "correct": "C",
+            "explanation": "Despite its name, NaN (Not-a-Number) is of type 'number' in JavaScript. This is part of the IEEE 754 floating-point standard."
+        },
+        {
+            "id": 7,
+            "type": "mcq",
+            "difficulty": "medium",
+            "question": "Which array method returns a new array without modifying the original?",
+            "choices": [
+                "A. splice()",
+                "B. push()",
+                "C. map()",
+                "D. sort()"
+            ],
+            "correct": "C",
+            "explanation": "map() returns a new array with transformed elements. splice() and push() mutate the original array. sort() mutates in place."
+        },
+        {
+            "id": 8,
+            "type": "code",
+            "difficulty": "medium",
+            "question": "What does the following code output?",
+            "code": "const arr = [1, 2, 3];\nconst doubled = arr.map(x => x * 2);\nconsole.log(doubled);",
+            "choices": [
+                "A. [1, 2, 3]",
+                "B. [2, 4, 6]",
+                "C. [1, 4, 9]",
+                "D. undefined"
+            ],
+            "correct": "B",
+            "explanation": "map() applies x => x * 2 to each element: 1*2=2, 2*2=4, 3*2=6, producing [2, 4, 6]."
+        },
+        {
+            "id": 9,
+            "type": "code",
+            "difficulty": "medium",
+            "question": "What is logged to the console?",
+            "code": "let x = 10;\nfunction foo() {\n  console.log(x);\n  let x = 20;\n}\nfoo();",
+            "choices": [
+                "A. 10",
+                "B. 20",
+                "C. undefined",
+                "D. ReferenceError"
+            ],
+            "correct": "D",
+            "explanation": "The let declaration creates a temporal dead zone. Accessing x before the let statement throws a ReferenceError, not undefined."
+        },
+        {
+            "id": 10,
+            "type": "truefalse",
+            "difficulty": "medium",
+            "question": "The Promise.all() method rejects as soon as any one of the input promises rejects.",
+            "correct": "True",
+            "explanation": "Promise.all() is fail-fast: it rejects immediately when any input promise rejects, with the reason of the first rejected promise."
+        },
+        {
+            "id": 11,
+            "type": "mcq",
+            "difficulty": "medium",
+            "question": "What does the spread operator (...) do when used with an array?",
+            "choices": [
+                "A. Deep clones the array",
+                "B. Expands the array into individual elements",
+                "C. Reverses the array",
+                "D. Flattens nested arrays"
+            ],
+            "correct": "B",
+            "explanation": "The spread operator expands an iterable into individual elements. It creates a shallow copy, not a deep clone. It does not flatten or reverse."
+        },
+        {
+            "id": 12,
+            "type": "mcq",
+            "difficulty": "hard",
+            "question": "What is the output of: console.log(typeof null)?",
+            "choices": [
+                "A. \"null\"",
+                "B. \"undefined\"",
+                "C. \"object\"",
+                "D. \"boolean\""
+            ],
+            "correct": "C",
+            "explanation": "typeof null returns 'object'. This is a long-standing bug in JavaScript retained for backward compatibility."
+        },
+        {
+            "id": 13,
+            "type": "code",
+            "difficulty": "hard",
+            "question": "What does this code output?",
+            "code": "const a = [1, 2, 3];\nconst b = a;\nb.push(4);\nconsole.log(a.length);",
+            "choices": [
+                "A. 3",
+                "B. 4",
+                "C. undefined",
+                "D. TypeError"
+            ],
+            "correct": "B",
+            "explanation": "Arrays are reference types. b = a does not copy the array; both variables point to the same array. Pushing to b also affects a."
+        },
+        {
+            "id": 14,
+            "type": "mcq",
+            "difficulty": "hard",
+            "question": "Which statement about closures is correct?",
+            "choices": [
+                "A. A closure is created only when a function is called",
+                "B. A closure gives access to an outer function's scope from an inner function",
+                "C. Closures cannot access variables declared with let",
+                "D. Closures are only available in strict mode"
+            ],
+            "correct": "B",
+            "explanation": "A closure is formed when an inner function retains access to the outer function's variables. This works with var, let, and const, in any mode."
+        },
+        {
+            "id": 15,
+            "type": "truefalse",
+            "difficulty": "hard",
+            "question": "In JavaScript, 0.1 + 0.2 === 0.3 evaluates to true.",
+            "correct": "False",
+            "explanation": "Due to IEEE 754 floating-point precision, 0.1 + 0.2 equals 0.30000000000000004, not exactly 0.3. The strict comparison returns false."
+        },
+        {
+            "id": 16,
+            "type": "mcq",
+            "difficulty": "medium",
+            "question": "What is the purpose of the async keyword before a function?",
+            "choices": [
+                "A. It makes the function run in a separate thread",
+                "B. It makes the function return a Promise",
+                "C. It makes the function execute immediately",
+                "D. It prevents the function from throwing errors"
+            ],
+            "correct": "B",
+            "explanation": "async makes a function return a Promise. JavaScript is single-threaded; async does not create threads. It enables the use of await inside."
+        }
+    ]
+}
