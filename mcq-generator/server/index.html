@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCQ Quizzes</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1rem;
+            color: #1e293b;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #068149;
+        }
+
+        p.subtitle {
+            color: #64748b;
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.25rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        a.card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.4rem 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+        }
+
+        a.card:hover {
+            box-shadow: 0 4px 18px rgba(6, 129, 73, 0.15);
+            transform: translateY(-2px);
+            border-color: #068149;
+        }
+
+        a.card .label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #068149;
+        }
+
+        a.card .name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        a.card .filename {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-top: 0.2rem;
+        }
+
+        footer {
+            margin-top: 3rem;
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>MCQ Quizzes</h1>
+    <p class="subtitle">Pick a subject to start</p>
+    <div class="grid" id="grid"></div>
+    <footer id="footer"></footer>
+
+    <script>
+        const FILES_URL = "/files.json";
+
+        function toTitle(filename) {
+            return filename
+                .replace(/^mcq-/, "")
+                .replace(/\.html$/, "")
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        async function render() {
+            let files;
+            try {
+                const res = await fetch(FILES_URL);
+                files = await res.json();
+            } catch {
+                document.getElementById("grid").innerHTML =
+                    "<p style='color:#ef4444'>Could not load file list. Make sure the server is running.</p>";
+                return;
+            }
+
+            const grid = document.getElementById("grid");
+            const quizFiles = files.filter(f => f.endsWith(".html"));
+
+            if (quizFiles.length === 0) {
+                grid.innerHTML = "<p style='color:#64748b'>No quiz files found in output/. Run <code>python3 cli.py</code> first.</p>";
+                return;
+            }
+
+            quizFiles.forEach(file => {
+                const a = document.createElement("a");
+                a.className = "card";
+                a.href = "/output/" + file;
+                a.innerHTML = `
+          <span class="label">Quiz</span>
+          <span class="name">${toTitle(file)}</span>
+          <span class="filename">${file}</span>
+        `;
+                grid.appendChild(a);
+            });
+
+            document.getElementById("footer").textContent =
+                quizFiles.length + " quiz" + (quizFiles.length !== 1 ? "zes" : "") + " available";
+        }
+
+        render();
+    </script>
+</body>
+
+</html>

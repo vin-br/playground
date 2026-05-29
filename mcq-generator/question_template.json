@@ -1,0 +1,63 @@
+{
+  "_comment": "Template for MCQ questions. Fill in 'subject', 'subject_key', and set 'id' starting values. Pass this to an AI alongside course content and PREPROMPT.md. Remove all _comment fields from the final output.",
+  "subject": "[SUBJECT NAME]",
+  "subject_key": "[subject_key]",
+  "questions": [
+    {
+      "_comment_type": "mcq = 4-choice, truefalse = True/False only, code = 4-choice with a code snippet",
+      "_comment_difficulty": "easy ~30%, medium ~50%, hard ~20% of total questions",
+      "_comment_distribution": "Spread correct answers evenly: ~25% A, ~25% B, ~25% C, ~25% D across ALL mcq/code questions",
+      "_comment_choices": "Always 4 choices labeled A–D. Each choice text must be a complete answer. Never use 'None of the above' or 'All of the above'",
+      "_comment_code": "Optional. Raw code string, use \\n for newlines. Only for type=code questions. Escape < as \\x3C inside string values.",
+      "id": 1,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What is the primary purpose of [concept X]?",
+      "choices": [
+        "A. First plausible answer",
+        "B. Correct answer text here",
+        "C. Third plausible answer",
+        "D. Fourth plausible answer"
+      ],
+      "correct": "B",
+      "explanation": "B is correct because [reason]. A is wrong because [reason]. C and D are wrong because [reason]."
+    },
+    {
+      "id": 2,
+      "type": "truefalse",
+      "difficulty": "easy",
+      "question": "[Statement that is either true or false about the subject].",
+      "correct": "False",
+      "explanation": "This is false because [reason]. The actual behavior is [clarification]."
+    },
+    {
+      "id": 3,
+      "type": "code",
+      "difficulty": "medium",
+      "question": "What does the following code output?",
+      "code": "# Replace with a code snippet in the target language\nx = [1, 2, 3]\nprint(len(x))",
+      "choices": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. An error occurs"
+      ],
+      "correct": "C",
+      "explanation": "len() returns the number of elements. The list has 3 elements, so the output is 3. A and B are common off-by-one mistakes."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which of the following best describes [advanced concept Y]?",
+      "choices": [
+        "A. Plausible but incorrect description",
+        "B. Another plausible but incorrect description",
+        "C. A common misconception about Y",
+        "D. Correct and precise description of Y"
+      ],
+      "correct": "D",
+      "explanation": "D is correct because [detailed reason]. A confuses Y with [related concept]. B describes [different concept]. C is a common misconception because [reason]."
+    }
+  ]
+}

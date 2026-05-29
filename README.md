@@ -1,13 +1,22 @@
 # Playground
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/vin-br/) [![DataCamp](https://img.shields.io/badge/DataCamp-Connect-green?style=flat&logo=datacamp&logoColor=white)](https://app.datacamp.com/profile/vin-br) [![CodinGame](https://img.shields.io/badge/CodinGame-Profile-yellow?style=flat&logo=codingame&logoColor=white)](https://www.codingame.com/profile/bf2837204fb4442bda80f17459e8785e9714015) ![Codewars Badge](https://www.codewars.com/users/vin-br/badges/small)
+---
 
-This repository contains my solutions to various coding challenges from CodinGame and Codewars.
+[![LinkedIn](https://custom-icon-badges.demolab.com/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin-white&logoColor=white)](https://www.linkedin.com/in/vin-br/) [![GitLab](https://img.shields.io/badge/GitLab-Repository-FC6D26?style=for-the-badge&logo=gitlab&logoColor=white)](https://gitlab.com/vin-br/playground) [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github&logoColor=white)](https://github.com/vin-br/playground)
 
-## About
+---
 
-This repository demonstrates my approach to solving algorithmic problems using different programming languages.
+# Overview
 
-## Disclamer
+This repository is a collection of coding challenges, tools and scripts.
 
-This repository is intended for educational purposes only.
+| Project | Description |
+|---------|-------------|
+| [mcq-generator](mcq-generator/) | Generate self-contained HTML interactive quiz files from JSON question banks |
+| [health-converter](health-converter/) | Convert Withings Health Mate CSV exports into per-workout GPX files for Strava |
+| [codewars](codewars/) | Solutions to Codewars kata in Python and R |
+| [codingame](codingame/) | Solutions to CodinGame puzzles and bot challenges |
+
+## Disclaimer
+
+This repository is intended for educational and personal use only.
