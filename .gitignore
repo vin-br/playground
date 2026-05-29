@@ -63,3 +63,5 @@ pytest_cache/
 
 # ---- Health Converter Specific ----
 health-converter/data/
+mcq-generator/output/*.html
+mcq-generator/input/*.json
