@@ -1,94 +1,131 @@
-# Health Converter: CSV to GPX
+# Health Converter
 
-Convert a Withings Health Mate CSV export into per-workout `.gpx` files compatible with Strava.
+Modular health data import/export framework. Currently converts Withings CSV exports to Strava-compatible GPX files. Designed to be extended with additional importers (Garmin, Fitbit, Apple Health) and exporters (TCX, FIT, API).
+
+## Architecture
+
+```
+health-converter/
+  models.py              # Pydantic models: Workout, TrackPoint, StravaActivityType
+  sport_mapping.py       # Withings codes -> normalized labels -> Strava types
+  importers/
+    base.py              # BaseImporter ABC
+    withings.py          # WithingsImporter — reads Withings CSV export
+  exporters/
+    base.py              # BaseExporter ABC
+    gpx.py               # GPXExporter — produces Strava-compatible GPX
+cli.py                   # CLI entry point (also installable as `health-converter` command)
+```
+
+**Data flow:** `Source format -> Importer -> [Workout] -> Exporter -> Target format`
+
+Adding a new source (e.g. Garmin): subclass `BaseImporter`, implement `load()` returning `list[Workout]`.
+Adding a new target (e.g. TCX): subclass `BaseExporter`, implement `export_one()` consuming a `Workout`.
 
 ## Requirements
 
-- Python 3.12+
+- Python 3.14+
 - [uv](https://docs.astral.sh/uv/) (`pip install uv` or `brew install uv`)
 
 ## Setup
 
 ```bash
-cd health_converter
+cd csv2gpx
 uv sync
 ```
 
-## Workflow
+## Usage
 
 ### 1. Export your Withings data
 
-Go to https://account.withings.com/export/user_select, request your archive, and unzip it into `data/csv/`.
+Go to https://account.withings.com/export/user_select, request your archive, and unzip it.
 
-### 2. Inspect the export (do this first)
+### 2. Inspect the export (optional diagnostic)
 
 ```bash
-uv run inspect_export.py data/csv
+uv run cli.py data/csv/ --inspect
 ```
 
-This prints column names from your `activities.csv` and sample GPS/HR rows.
-Withings changes column names between export versions — always verify first.
+Prints column names, sample rows, and detected sport labels to help debug format changes.
 
 ### 3. Convert to GPX
 
 ```bash
-uv run withings_to_gpx.py data/csv
+uv run cli.py data/csv/
 # custom output dir:
-uv run withings_to_gpx.py data/csv --output ~/Sports/withings_gpx
+uv run cli.py data/csv/ --output ~/Sports/gpx
+# see per-file details:
+uv run cli.py data/csv/ --verbose
+```
+
+If installed (`uv pip install .`), you can also use the `health-converter` command directly:
+
+```bash
+health-converter data/csv/ --output ~/Sports/gpx
 ```
 
 ### 4. Upload to Strava
 
 Go to https://www.strava.com/upload/select and drag-and-drop the GPX files.
 
----
-
-## Directory structure
+## Output structure
 
 ```
-data/
-  csv/                    # Your Withings export (gitignored)
-    activities.csv
-    raw_location_*.csv
-    raw_hr_hr.csv
-  gpx/                    # Generated GPX files (gitignored)
-    2022/
-      20220314_073015_ride.gpx
-      20220318_183200_run.gpx
-    2023/
-      20230101_090000_hike.gpx
+output/
+  2022/
+    20220314_073015_ride.gpx
+    20220318_183200_run.gpx
+  2023/
+    20230101_090000_indoor_cycling.gpx
 ```
 
-Filename: `YYYYMMDD_HHMMSS_<sport>.gpx` (UTC timestamps, sorts chronologically).
+## Sport type mapping (Withings -> Strava)
 
-## Sport type mapping (Withings code → filename slug)
+| Withings label  | Strava `<type>`  | Notes                       |
+|-----------------|------------------|-----------------------------|
+| Walking         | `Walk`           |                             |
+| Running         | `Run`            |                             |
+| Hiking          | `Hike`           |                             |
+| Cycling         | `Ride`           | Auto-reclassified if indoor |
+| Indoor Cycling  | `VirtualRide`    | Synthetic GPS for distance  |
+| Swimming        | `Swim`           |                             |
+| Rowing          | `Rowing`         | Synthetic GPS for distance  |
+| Tennis          | `Workout`        |                             |
+| Weights         | `WeightTraining` |                             |
+| Yoga            | `Yoga`           |                             |
+| Other           | `Workout`        |                             |
 
-| Code | Withings sport  | Slug            |
-|------|-----------------|-----------------|
-| 1    | Walk            | `walk`          |
-| 2    | Run             | `run`           |
-| 3    | Hike            | `hike`          |
-| 6    | Cycling         | `ride`          |
-| 7    | Swimming        | `swim`          |
-| 306  | Indoor cycling  | `indoor_cycling`|
-| 307  | Indoor run      | `indoor_run`    |
-| 309  | Rowing          | `rowing`        |
-| 34   | Alpine ski      | `ski`           |
-
-Full list in `SPORT_MAP` inside `withings_to_gpx.py`.
+Full mapping in `health-converter/sport_mapping.py`.
 
 ## How it works
 
-1. `activities.csv` is parsed for rows with a numeric sport code (= workouts).
-2. GPS points from `raw_location_latitude/longitude/altitude.csv` are extracted
-   within each workout's `[start, end]` timestamp window.
-3. Heart rate from `raw_hr_hr.csv` is joined to GPS points (nearest within 30s).
-4. GPX is emitted with `<trk type="...">` set for Strava sport detection.
+1. `WithingsImporter` parses `activities.csv` for workout rows (string labels or numeric codes).
+2. The `Data` JSON column provides distance; `GPS` JSON provides reference coordinates.
+3. Activities labeled "Cycling" with no GPS movement are reclassified as indoor cycling.
+4. GPS from `raw_location_*.csv` and HR from `raw_hr_hr.csv` are matched to each workout's time window.
+5. Indoor activities with distance get synthetic trackpoints so Strava computes correct distance.
+6. `GPXExporter` produces GPX with `<trk type="VirtualRide">` etc., and Garmin HR extensions.
+
+## Extending for a web app
+
+The Pydantic `Workout` model is FastAPI-ready:
+
+```python
+from fastapi import FastAPI, UploadFile
+from health-converter.importers.withings import WithingsImporter
+from health-converter.exporters.gpx import GPXExporter
+
+app = FastAPI()
+
+@app.post("/convert/withings")
+async def convert_withings(file: UploadFile):
+    # Extract zip, run importer, return GPX files
+    ...
+```
 
 ## Notes
 
-- **No-GPS workouts** (indoor cycling, gym…) still export with start/end timestamps
-  so Strava records duration and sport type correctly.
-- HR data format: `Duration=[d1,d2,…]` + `Value=[v1,v2,…]` = HR v1 for d1 seconds, etc.
-- If conversion fails, run `inspect_export.py` first — column names in `activities.csv`
-  differ between Withings export versions.
+- **No-GPS workouts** still export with start/end timestamps for duration tracking.
+- **Indoor activities with distance** get synthetic GPS so Strava shows correct distance.
+- **Apple Health imports** that mislabel indoor cycling are auto-detected and reclassified.
+- HR data is injected as Garmin TrackPointExtension XML.
