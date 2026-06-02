@@ -21,27 +21,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 3rem 1rem;
+            padding: 1.5rem 1rem;
             color: #1e293b;
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             color: #068149;
         }
 
         p.subtitle {
             color: #64748b;
-            margin-bottom: 2.5rem;
-            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
             width: 100%;
             max-width: 900px;
         }
@@ -49,11 +49,11 @@
         a.card {
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.3rem;
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 1.4rem 1.5rem;
+            padding: 1rem 1.1rem;
             text-decoration: none;
             color: inherit;
             transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
@@ -131,7 +131,7 @@
             quizFiles.forEach(file => {
                 const a = document.createElement("a");
                 a.className = "card";
-                a.href = "/output/" + file;
+                a.href = file;
                 a.innerHTML = `
           <span class="label">Quiz</span>
           <span class="name">${toTitle(file)}</span>
