@@ -22,15 +22,7 @@ Generate **[N]** questions for the subject **"[SUBJECT]"** (use `subject_key: "[
 
 ### Question type distribution
 
-Adjust these ratios depending on the subject. For subjects **with code snippets**:
-
-| Type        | Format                              | Target % |
-|-------------|-------------------------------------|----------|
-| `mcq`       | 4 choices (A–D)                     | ~75%     |
-| `truefalse` | True / False only                   | ~15%     |
-| `code`      | 4 choices (A–D) with a code snippet | ~10%     |
-
-For subjects **without code snippets** (cloud, theory, etc.):
+Adjust these ratios depending on the subject:
 
 | Type        | Format                              | Target % |
 |-------------|-------------------------------------|----------|
@@ -67,12 +59,8 @@ For subjects **without code snippets** (cloud, theory, etc.):
 
 ### Template
 
-```json
-[paste question_template.json here]
-```
+Template file added to the conversation
 
 ### Course content
 
-```markdown
-[paste your course markdown here]
-```
+Course file added to the conversation

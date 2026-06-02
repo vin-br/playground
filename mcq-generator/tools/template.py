@@ -94,7 +94,7 @@ TEMPLATE = r'''<!DOCTYPE html>
             const app = document.getElementById("app");
             const PART_SIZE = 50;
 
-            let allShuffled = [], parts = [], currentPartIndex = -1;
+            let parts = [], currentPartIndex = -1;
             let partQuestions = [], current = 0, score = 0, answers = [];
             let selectedValue = null;
             let countByDiff, correctByDiff, countByType, correctByType;
@@ -127,11 +127,14 @@ TEMPLATE = r'''<!DOCTYPE html>
             }
 
             function init() {
-                allShuffled = sortByDifficulty(shuffle(QUESTIONS));
-                const total = allShuffled.length;
+                // Partition deterministically by original question order (IDs),
+                // so Part 1 always has questions 1-50, Part 2 has 51-100, etc.
+                // Shuffling only happens within each part when it is started.
+                var sorted = sortByDifficulty([...QUESTIONS]);
+                var total = sorted.length;
                 parts = [];
                 for (let i = 0; i < total; i += PART_SIZE) {
-                    parts.push(allShuffled.slice(i, Math.min(i + PART_SIZE, total)));
+                    parts.push(sorted.slice(i, Math.min(i + PART_SIZE, total)));
                 }
                 renderWelcome();
             }
@@ -174,8 +177,8 @@ TEMPLATE = r'''<!DOCTYPE html>
                 current = 0; score = 0; answers = []; selectedValue = null;
                 countByDiff = { easy: 0, medium: 0, hard: 0 };
                 correctByDiff = { easy: 0, medium: 0, hard: 0 };
-                countByType = { mcq: 0, truefalse: 0, code: 0 };
-                correctByType = { mcq: 0, truefalse: 0, code: 0 };
+                countByType = { mcq: 0, truefalse: 0 };
+                correctByType = { mcq: 0, truefalse: 0 };
                 partQuestions.forEach(function (q) { countByDiff[q.difficulty]++; countByType[q.type]++; });
                 render();
             }
