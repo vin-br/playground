@@ -35,7 +35,10 @@ uv python install 3.14.5
 # Run the CLI — it processes all files automatically
 python3 cli.py
 
-# Open a generated file
+# Option 1: Serve locally via Docker + nginx
+python3 -m tools.serve output
+
+# Option 2: Open a generated file directly
 open output/mcq-javascript.html
 ```
 
@@ -64,6 +67,25 @@ The CLI processes every `*.json` file in `input/` through three steps:
 python3 cli.py              # default seed (42)
 python3 cli.py --seed 123   # custom random seed
 ```
+
+## Serving locally
+
+Serve generated quiz files via Docker + nginx:
+
+```bash
+# Serve the output/ folder on port 8080 (requires Docker)
+python3 tools/serve.py
+
+# Serve a different folder on a custom port
+python3 tools/serve.py /path/to/folder --port 3000
+```
+
+This will:
+- Display local URL: `http://localhost:8080`
+- Display LAN URL: `http://{your-ip}:8080` (for sharing with others on the network)
+- Serve files read-only from a lightweight nginx container
+
+Press `Ctrl+C` to stop.
 
 ## Creating questions
 
