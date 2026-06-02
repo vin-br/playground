@@ -61,7 +61,8 @@ pytest_cache/
 *.pid
 *.seed
 
-# ---- Health Converter Specific ----
+# ---- Projects Specific ----
 health-converter/data/
 mcq-generator/output/*.html
 mcq-generator/input/*.json
+mcq-generator/content/*/
