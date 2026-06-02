@@ -1,4 +1,7 @@
 """Serve quiz files locally via Docker + nginx."""
+import argparse
+import glob
+import json
 import os
 import shutil
 import socket
@@ -12,6 +15,24 @@ def cmd_serve(base: str, port: int = 8080) -> None:
         sys.exit(1)
 
     abs_base = os.path.abspath(base)
+    
+    # Copy server/index.html to the base directory if it exists
+    script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    server_index = os.path.join(script_dir, "server", "index.html")
+    output_index = os.path.join(abs_base, "index.html")
+    
+    if os.path.exists(server_index):
+        shutil.copy(server_index, output_index)
+        print(f"Copied {server_index} → {output_index}")
+    
+    # Generate files.json listing all .html files (excluding index.html)
+    html_files = sorted(glob.glob(os.path.join(abs_base, "*.html")))
+    files_list = [os.path.basename(f) for f in html_files if os.path.basename(f) != "index.html"]
+    
+    files_json_path = os.path.join(abs_base, "files.json")
+    with open(files_json_path, "w") as f:
+        json.dump(files_list, f, indent=2)
+    print(f"Generated {files_json_path} with {len(files_list)} file(s)")
 
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -35,3 +56,23 @@ def cmd_serve(base: str, port: int = 8080) -> None:
         ])
     except KeyboardInterrupt:
         print("\nStopped.")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Serve quiz files locally via Docker + nginx"
+    )
+    parser.add_argument(
+        "base",
+        nargs="?",
+        default="output",
+        help="directory to serve (default: output)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8080,
+        help="port to serve on (default: 8080)",
+    )
+    args = parser.parse_args()
+    cmd_serve(args.base, args.port)
