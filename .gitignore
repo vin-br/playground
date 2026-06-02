@@ -64,5 +64,6 @@ pytest_cache/
 # ---- Projects Specific ----
 health-converter/data/
 mcq-generator/output/*.html
+mcq-generator/output/*.json
 mcq-generator/input/*.json
 mcq-generator/content/*/
