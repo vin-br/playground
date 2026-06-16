@@ -49,7 +49,7 @@ def cmd_serve(base: str, port: int = 8080) -> None:
 
     try:
         subprocess.run([
-            "docker", "run", "--rm",
+            "docker", "run", "-d" ,"--rm",
             "-p", f"{port}:80",
             "-v", f"{abs_base}:/usr/share/nginx/html:ro",
             "nginx:alpine",
