@@ -32,7 +32,12 @@ def json_to_js_questions(questions: list[dict]) -> str:
         if q.get("choices"):
             choices_str = ", ".join(f'"{_escape_js(c)}"' for c in q["choices"])
             parts.append(f"choices: [{choices_str}]")
-        parts.append(f'correct: "{_escape_js(q["correct"])}"')
+        correct = q["correct"]
+        if isinstance(correct, list):
+            correct_str = ", ".join(f'"{_escape_js(str(c))}"' for c in correct)
+            parts.append(f"correct: [{correct_str}]")
+        else:
+            parts.append(f'correct: "{_escape_js(str(correct))}"')
         parts.append(f'explanation: "{_escape_js(q["explanation"])}"')
         lines.append("            { " + ", ".join(parts) + " },")
     lines.append("        ];")

@@ -20,7 +20,8 @@ TEMPLATE = r'''<!DOCTYPE html>
         .badge{font-size:.65rem;font-weight:600;padding:3px 10px;border-radius:99px;color:#fff;text-transform:uppercase;letter-spacing:.05em}
         .badge-mcq{background:var(--badge-mcq)}.badge-truefalse{background:var(--badge-tf)}.badge-code{background:var(--badge-code)}
         .badge-easy{background:var(--badge-easy)}.badge-medium{background:var(--badge-medium)}.badge-hard{background:var(--badge-hard)}
-        .question-text{font-size:1.1rem;font-weight:600;margin-bottom:1.25rem;line-height:1.5}
+        .question-text{font-size:1.1rem;font-weight:600;margin-bottom:.5rem;line-height:1.5}
+        .question-hint{font-size:.85rem;color:var(--muted);margin-bottom:1.25rem;font-weight:500}
         pre.code-block{background:var(--code-bg);color:var(--code-text);padding:1.25rem;border-radius:var(--radius);overflow-x:auto;font-size:.82rem;line-height:1.6;margin-bottom:1.25rem;font-family:'JetBrains Mono','SF Mono',Consolas,monospace;white-space:pre}
         %%CODE_CSS%%
         .choices{display:flex;flex-direction:column;gap:.5rem}
@@ -96,7 +97,7 @@ TEMPLATE = r'''<!DOCTYPE html>
 
             let parts = [], currentPartIndex = -1;
             let partQuestions = [], current = 0, score = 0, answers = [];
-            let selectedValue = null;
+            let selectedValues = [];
             let countByDiff, correctByDiff, countByType, correctByType;
 
             function shuffle(a) {
@@ -111,6 +112,25 @@ TEMPLATE = r'''<!DOCTYPE html>
             function sortByDifficulty(arr) {
                 const order = { easy: 0, medium: 1, hard: 2 };
                 return [...arr].sort((a, b) => order[a.difficulty] - order[b.difficulty]);
+            }
+
+            function isMultiAnswer(q) {
+                return Array.isArray(q.correct);
+            }
+
+            function correctValues(q) {
+                return isMultiAnswer(q) ? q.correct.map(String) : [String(q.correct)];
+            }
+
+            function sameAnswerSet(selected, correct) {
+                if (selected.length !== correct.length) return false;
+                var s = selected.slice().sort();
+                var c = correct.slice().sort();
+                return s.every(function (v, i) { return v === c[i]; });
+            }
+
+            function displayValues(values) {
+                return values && values.length ? values.join(", ") : "No answer";
             }
 
             function getStored(idx) {
@@ -174,7 +194,7 @@ TEMPLATE = r'''<!DOCTYPE html>
             function startPart(idx) {
                 currentPartIndex = idx;
                 partQuestions = shuffle(parts[idx]);
-                current = 0; score = 0; answers = []; selectedValue = null;
+                current = 0; score = 0; answers = []; selectedValues = [];
                 countByDiff = { easy: 0, medium: 0, hard: 0 };
                 correctByDiff = { easy: 0, medium: 0, hard: 0 };
                 countByType = { mcq: 0, truefalse: 0 };
@@ -185,9 +205,11 @@ TEMPLATE = r'''<!DOCTYPE html>
 
             function render() {
                 if (current >= partQuestions.length) { renderResults(); return; }
-                selectedValue = null;
+                selectedValues = [];
                 const q = partQuestions[current];
-                const typeBadge = q.type === "mcq" ? "MCQ" : q.type === "truefalse" ? "True / False" : "Code Snippet";
+                const multi = q.type === "mcq" && isMultiAnswer(q);
+                const typeBadge = q.type === "mcq" ? (multi ? "MCQ · Multiple answers" : "MCQ · Single answer") : q.type === "truefalse" ? "True / False" : "Code Snippet";
+                const answerHint = q.type === "mcq" ? (multi ? "Select all correct answers, then check." : "Select one answer, then check.") : "Select one answer, then check.";
                 const typeClass = "badge-" + q.type;
                 let choicesArr;
                 if (q.type === "truefalse") {
@@ -205,6 +227,7 @@ TEMPLATE = r'''<!DOCTYPE html>
                 h += '<p class="progress-text">Question ' + (current + 1) + ' / ' + partQuestions.length + '</p>';
                 h += '<div class="card"><div class="badges"><span class="badge ' + typeClass + '">' + typeBadge + '</span><span class="badge badge-' + q.difficulty + '">' + q.difficulty + '</span></div>';
                 h += '<p class="question-text">' + escHtml(q.question) + '</p>';
+                h += '<p class="question-hint">' + answerHint + '</p>';
                 if (q.code) h += '<pre class="code-block">' + highlight(q.code) + '</pre>';
                 h += '<div class="choices">';
                 if (q.type === "truefalse") {
@@ -217,36 +240,51 @@ TEMPLATE = r'''<!DOCTYPE html>
                 h += '<button class="btn btn-primary" id="next-btn" style="display:none">Next</button></div>';
                 app.innerHTML = h;
                 app.querySelectorAll('.choice-btn').forEach(function (btn) {
-                    btn.addEventListener('click', function () { selectChoice(btn); });
+                    btn.addEventListener('click', function () { selectChoice(btn, q); });
                 });
                 document.getElementById('check-btn').addEventListener('click', function () { checkAnswer(q); });
                 document.getElementById('next-btn').addEventListener('click', function () { current++; render(); });
                 document.getElementById('menu-link').addEventListener('click', function () { renderWelcome(); });
             }
 
-            function selectChoice(btn) {
+            function selectChoice(btn, q) {
                 if (document.getElementById('next-btn').style.display !== 'none') return;
-                app.querySelectorAll('.choice-btn').forEach(function (b) { b.classList.remove('selected'); });
-                btn.classList.add('selected');
-                selectedValue = btn.getAttribute('data-value');
-                document.getElementById('check-btn').disabled = false;
+                var value = btn.getAttribute('data-value');
+                if (q.type === "mcq" && isMultiAnswer(q)) {
+                    if (selectedValues.indexOf(value) >= 0) {
+                        selectedValues = selectedValues.filter(function (v) { return v !== value; });
+                        btn.classList.remove('selected');
+                    } else {
+                        selectedValues.push(value);
+                        btn.classList.add('selected');
+                    }
+                } else {
+                    app.querySelectorAll('.choice-btn').forEach(function (b) { b.classList.remove('selected'); });
+                    btn.classList.add('selected');
+                    selectedValues = [value];
+                }
+                document.getElementById('check-btn').disabled = selectedValues.length === 0;
             }
 
             function checkAnswer(q) {
                 var btns = app.querySelectorAll('.choice-btn');
+                var correct = correctValues(q);
                 btns.forEach(function (b) { b.disabled = true; });
-                var isCorrect = selectedValue === q.correct;
+                var isCorrect = sameAnswerSet(selectedValues, correct);
                 if (isCorrect) { score++; correctByDiff[q.difficulty]++; correctByType[q.type]++; }
                 btns.forEach(function (b) {
-                    if (b.getAttribute('data-value') === selectedValue) {
+                    var value = b.getAttribute('data-value');
+                    var wasSelected = selectedValues.indexOf(value) >= 0;
+                    var isAnswer = correct.indexOf(value) >= 0;
+                    if (wasSelected) {
                         b.classList.remove('selected');
-                        b.classList.add(isCorrect ? 'correct' : 'wrong');
+                        b.classList.add(isAnswer ? 'correct' : 'wrong');
                     }
-                    if (!isCorrect && b.getAttribute('data-value') === q.correct) {
+                    if (!isCorrect && isAnswer) {
                         b.classList.add('reveal-correct');
                     }
                 });
-                answers.push({ q: q, chosen: selectedValue, isCorrect: isCorrect });
+                answers.push({ q: q, chosen: selectedValues.slice(), isCorrect: isCorrect });
                 var expl = document.getElementById('expl');
                 expl.className = 'explanation show ' + (isCorrect ? 'is-correct' : 'is-wrong');
                 expl.innerHTML = '<strong>' + (isCorrect ? '\u2713 Correct!' : '\u2717 Incorrect') + '</strong>' + escHtml(q.explanation);
@@ -281,8 +319,8 @@ TEMPLATE = r'''<!DOCTYPE html>
                     wrong.forEach(function (a) {
                         h += '<div class="card review-item"><p class="question-text">' + escHtml(a.q.question) + '</p>';
                         if (a.q.code) h += '<pre class="code-block">' + highlight(a.q.code) + '</pre>';
-                        h += '<p class="review-detail yours">Your answer: ' + escHtml(a.chosen) + '</p>';
-                        h += '<p class="review-detail correct-ans">Correct answer: ' + escHtml(a.q.correct) + '</p>';
+                        h += '<p class="review-detail yours">Your answer: ' + escHtml(displayValues(a.chosen)) + '</p>';
+                        h += '<p class="review-detail correct-ans">Correct answer: ' + escHtml(displayValues(correctValues(a.q))) + '</p>';
                         h += '<p class="review-explanation">' + escHtml(a.q.explanation) + '</p></div>';
                     });
                 }
